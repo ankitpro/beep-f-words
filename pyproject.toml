@@ -5,6 +5,7 @@ description = "Transcribe videos, censor profanities with beeps, and output clea
 authors = ["Ankit Agarwal <ankitagarwalpro@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -17,5 +18,3 @@ watchdog = "^6.0.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-package-mode = false
