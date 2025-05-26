@@ -23,7 +23,7 @@ def main():
         st.session_state.stop_processing = False
 
     uploaded_file = st.file_uploader("Upload a movie/video file", type=["mp4", "mov", "mkv"])
-    language = st.selectbox("Select video language", ["en", "hi", "fr", "es"], index=0)
+    language = st.selectbox("Select video language", ["en", "hi", "fr", "es"])
     model_size = st.selectbox("Whisper model size", ["tiny", "base", "small", "medium", "large"],
                               help="Larger models = better accuracy but more time.")
     download_subs = st.checkbox("Download Subtitles")
@@ -69,7 +69,7 @@ def main():
                 if st.session_state.stop_processing: return
 
                 log("🧠 Step 2: Transcribing...")
-                segments = transcribe_audio(audio_path, model_size, language=language)
+                segments = transcribe_audio(audio_path, model_size, input_language=language)
                 progress_bar.progress(40)
                 if st.session_state.stop_processing: return
 

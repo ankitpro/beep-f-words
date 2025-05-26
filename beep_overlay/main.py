@@ -7,9 +7,9 @@ import os
 MODEL_SIZE = "medium"
 
 
-def transcribe_audio(audio_path, model_size=MODEL_SIZE):
+def transcribe_audio(audio_path, model_size=MODEL_SIZE, input_language="en"):
     model = whisper.load_model(model_size)
-    result = model.transcribe(audio_path, language="en", word_timestamps=True)
+    result = model.transcribe(audio_path, language=input_language, word_timestamps=True)
     return result['segments']
 
 
