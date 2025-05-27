@@ -3,10 +3,10 @@ import subprocess
 import os
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip
 
-def extract_audio2(video_path, audio_path):
+def extract_audio(video_path, audio_path):
     subprocess.run(["ffmpeg", "-y", "-i", video_path, "-q:a", "0", "-map", "a", audio_path], check=True)
 
-def extract_audio(video_path, audio_path):
+def extract_audio1(video_path, audio_path):
     clip = VideoFileClip(video_path)
     if not clip.audio:
         raise ValueError("Video has no audio stream.")
@@ -18,14 +18,14 @@ def add_audio_to_video(original_video_path, new_audio_path, output_path):
     video_with_new_audio = video.set_audio(new_audio)
     video_with_new_audio.write_videofile(output_path, codec='libx264', audio_codec='aac')
     
-def add_audio_to_video2(original_video_path, new_audio_path, output_path):
+def add_audio_to_video1(original_video_path, new_audio_path, output_path):
     subprocess.run([
         "ffmpeg", "-y", "-i", original_video_path, "-i", new_audio_path,
         "-map", "0:v", "-map", "1:a", "-map", "0:a", "-c:v", "copy", "-c:a", "aac",
         "-shortest", output_path
     ], check=True)
 
-def add_subtitles_to_video(video_path, subtitle_path, output_path):
+def add_subtitles_to_video1(video_path, subtitle_path, output_path):
     video = VideoFileClip(video_path)
 
     # Example: basic parsing of .srt file (you can enhance this)
@@ -49,7 +49,7 @@ def add_subtitles_to_video(video_path, subtitle_path, output_path):
     final = CompositeVideoClip(clips)
     final.write_videofile(output_path, codec='libx264', audio_codec='aac')
     
-def add_subtitles_to_video2(video_path, subtitle_path, output_path):
+def add_subtitles_to_video(video_path, subtitle_path, output_path):
     subprocess.run([
         "ffmpeg", "-y", "-i", video_path, "-vf", f"subtitles={subtitle_path}", output_path
     ], check=True)
@@ -59,3 +59,29 @@ def convert_srt_time(t):
     h, m, s_ms = t.split(':')
     s, ms = s_ms.split(',')
     return int(h) * 3600 + int(m) * 60 + int(s) + int(ms) / 1000
+
+def merge_audio_tracks(original_video, clean_audio, subtitles_file, output_path):
+    import subprocess
+    try:
+        command = [
+            "ffmpeg",
+            "-i", original_video,
+            "-i", clean_audio,
+            "-i", subtitles_file,
+            "-map", "0:v",
+            "-map", "1:a",
+            "-map", "0:a",
+            "-map", "2",
+            "-c:v", "copy",
+            "-c:a", "aac",
+            "-metadata:s:a:0", "title=Clean Audio",
+            "-metadata:s:a:1", "title=Original Audio",
+            "-c:s", "mov_text",
+            output_path
+        ]
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode != 0:
+            raise Exception(f"FFmpeg error: {result.stderr.decode('utf-8')}")
+    except Exception as e:
+        raise Exception(f"Error merging audio and video: {str(e)}")
+
